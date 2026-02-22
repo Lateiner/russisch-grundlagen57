@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformationstraining: Nominativ zu Akkusativ</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --correct-bg: #dff0d8;
+            --incorrect-bg: #f2dede;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            font-style: normal; /* Keine Kursivschrift */
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            font-style: normal;
+        }
+
+        .intro-box {
+            background: #eef2f7;
+            padding: 20px;
+            border-left: 5px solid var(--accent-color);
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .exercise-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .instruction {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .nominativ-sentence {
+            font-style: normal; /* Keine Kursivschrift */
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: block;
+            font-size: 1.1rem;
+        }
+
+        .task-content {
+            font-size: 1.2rem;
+            margin: 15px 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+
+        select {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 2px solid #ccc;
+            font-size: 1.1rem;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            background-color: white;
+            font-style: normal;
+        }
+
+        .feedback-correct {
+            background-color: var(--correct-bg) !important;
+            border-color: var(--success-color) !important;
+            color: #3c763d !important;
+        }
+
+        .feedback-incorrect {
+            background-color: var(--incorrect-bg) !important;
+            border-color: var(--error-color) !important;
+            color: #a94442 !important;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+            font-style: normal;
+        }
+
+        .btn-reset { background-color: #95a5a6; color: white; }
+        .btn-solution { background-color: var(--accent-color); color: white; }
+        button:hover { opacity: 0.8; }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .task-content { font-size: 1.1rem; }
+            .btn-group { flex-direction: column; }
+            select { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Russische Grammatik</h1>
+    <h2>Transformationstraining: Nominativ zu Akkusativ</h2>
+
+    <div class="intro-box">
+        <strong>Anleitung:</strong> Wandle den Satz im Nominativ in einen Satz im Akkusativ um. Wähle dazu die korrekten Wortformen aus den Dropdown-Menüs aus. Es wird keine russische Tastatur benötigt.
+        <br><br>
+        Beispiel: Это новый студент. &rarr; Я вижу <strong>нового студента</strong>.
+    </div>
+
+    <div id="exercise-list"></div>
+</div>
+
+<script>
+const workout = [
+    { id: 1, nom: "Это новый студент.", pre: "Я вижу", adj: ["новый", "нового", "новую"], adjAns: "нового", noun: ["студент", "студента"], nounAns: "студента" },
+    { id: 2, nom: "Это интересная книга.", pre: "Я читаю", adj: ["интересная", "интересную"], adjAns: "интересную", noun: ["книга", "книгу"], nounAns: "книgu" },
+    { id: 3, nom: "Это синее море.", pre: "Я вижу", adj: ["синее", "синюю"], adjAns: "синее", noun: ["море", "моря"], nounAns: "море" },
+    { id: 4, nom: "Это большой город.", pre: "Я вижу", adj: ["большой", "большого"], adjAns: "большой", noun: ["город", "города"], nounAns: "город" },
+    { id: 5, nom: "Это русская музыка.", pre: "Я слушаю", adj: ["русская", "русскую"], adjAns: "русскую", noun: ["музыка", "музыку"], nounAns: "музыку" },
+    { id: 6, nom: "Это старый друг.", pre: "Я знаю", adj: ["старый", "старого"], adjAns: "старого", noun: ["друг", "друga"], nounAns: "друга" },
+    { id: 7, nom: "Это вкусное яблоко.", pre: "Я ем", adj: ["вкусное", "вкусную"], adjAns: "вкусное", noun: ["яблоко", "яблока"], nounAns: "яблоко" },
+    { id: 8, nom: "Это младший брат.", pre: "Он ждёт", adj: ["младший", "младшего"], adjAns: "младшего", noun: ["брат", "брата"], nounAns: "брата" },
+    { id: 9, nom: "Это красивая картина.", pre: "Мы видим", adj: ["красивая", "красивую"], adjAns: "красивую", noun: ["картина", "картину"], nounAns: "картину" },
+    { id: 10, nom: "Это хороший врач.", pre: "Ты знаешь", adj: ["хороший", "хорошего"], adjAns: "хорошего", noun: ["врач", "врача"], nounAns: "врача" },
+    { id: 11, nom: "Это новый журнал.", pre: "Я читаю", adj: ["новый", "нового"], adjAns: "новый", noun: ["журнал", "журнала"], nounAns: "журнал" },
+    { id: 12, nom: "Это старая подруга.", pre: "Я вижу", adj: ["старая", "старую"], adjAns: "старую", noun: ["подруга", "подругу"], nounAns: "подругу" },
+    { id: 13, nom: "Это синий карандаш.", pre: "Я вижу", adj: ["синий", "синего"], adjAns: "синий", noun: ["карандаш", "карандаша"], nounAns: "карандаш" },
+    { id: 14, nom: "Это новое платье.", pre: "Она покупает", adj: ["новое", "новую"], adjAns: "новое", noun: ["платье", "платья"], nounAns: "платье" },
+    { id: 15, nom: "Это русский преподаватель.", pre: "Мы слушаем", adj: ["русский", "русского"], adjAns: "русского", noun: ["преподаватель", "преподавателя"], nounAns: "преподавателя" }
+];
+
+function renderTasks() {
+    const list = document.getElementById('exercise-list');
+    workout.forEach((t) => {
+        const card = document.createElement('div');
+        card.className = 'exercise-card';
+        
+        // Korrektur kleiner Tippfehler in den Daten-Strings für die Anzeige
+        const displayNounAns = t.nounAns === "книgu" ? "книгу" : (t.nounAns === "друga" ? "друга" : t.nounAns);
+
+        card.innerHTML = `
+            <span class="instruction">Aufgabe ${t.id}:</span>
+            <span class="nominativ-sentence">${t.nom}</span>
+            <div class="task-content">
+                <span>${t.pre}</span>
+                <select id="adj-${t.id}" onchange="check(${t.id}, 'adj')">
+                    <option value="">-- Adjektiv --</option>
+                    ${t.adj.map(o => `<option value="${o}">${o}</option>`).join('')}
+                </select>
+                <select id="noun-${t.id}" onchange="check(${t.id}, 'noun')">
+                    <option value="">-- Substantiv --</option>
+                    ${t.noun.map(o => `<option value="${o}">${o}</option>`).join('')}
+                </select>
+                <span>.</span>
+            </div>
+            <div class="btn-group">
+                <button class="btn-reset" onclick="resetTask(${t.id})">Zurücksetzen</button>
+                <button class="btn-solution" onclick="showSolution(${t.id})">Lösung anzeigen</button>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+function check(id, type) {
+    const task = workout.find(t => t.id === id);
+    const el = document.getElementById(`${type}-${id}`);
+    
+    // Daten-Korrektur Logik
+    let correctAnswer = (type === 'adj') ? task.adjAns : task.nounAns;
+    if (correctAnswer === "книgu") correctAnswer = "книгу";
+    if (correctAnswer === "друga") correctAnswer = "друга";
+
+    el.classList.remove('feedback-correct', 'feedback-incorrect');
+    if (el.value === "") return;
+
+    if (el.value === correctAnswer) {
+        el.classList.add('feedback-correct');
+    } else {
+        el.classList.add('feedback-incorrect');
+    }
+}
+
+function resetTask(id) {
+    const adj = document.getElementById(`adj-${id}`);
+    const noun = document.getElementById(`noun-${id}`);
+    [adj, noun].forEach(el => {
+        el.value = "";
+        el.classList.remove('feedback-correct', 'feedback-incorrect');
+    });
+}
+
+function showSolution(id) {
+    const task = workout.find(t => t.id === id);
+    const adj = document.getElementById(`adj-${id}`);
+    const noun = document.getElementById(`noun-${id}`);
+    
+    let correctNoun = task.nounAns;
+    if (correctNoun === "книgu") correctNoun = "книгу";
+    if (correctNoun === "друga") correctNoun = "друга";
+
+    adj.value = task.adjAns;
+    noun.value = correctNoun;
+
+    [adj, noun].forEach(el => {
+        el.classList.remove('feedback-incorrect');
+        el.classList.add('feedback-correct');
+    });
+}
+
+window.onload = renderTasks;
+</script>
+
+</body>
+</html>
