@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endungs-Puzzle: Russische Adjektive</title>
+    <!-- Polyfill für Drag & Drop auf Touch-Geräten -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            font-style: normal;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            font-style: normal;
+        }
+
+        .intro-box {
+            background: #eef2f7;
+            padding: 20px;
+            border-left: 5px solid var(--accent-color);
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        /* Bausteine Bereich */
+        .puzzle-pieces {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            background: #eee;
+            padding: 20px;
+            border-radius: 8px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .piece {
+            padding: 8px 15px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 4px;
+            cursor: grab;
+            font-weight: bold;
+            user-select: none;
+            font-size: 1.1rem;
+        }
+
+        .piece:active {
+            cursor: grabbing;
+        }
+
+        /* Aufgaben Liste */
+        .exercise-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .task-row {
+            background: #fafafa;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            font-size: 1.2rem;
+            gap: 5px;
+        }
+
+        .task-number {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-right: 10px;
+            min-width: 25px;
+        }
+
+        .drop-zone {
+            min-width: 60px;
+            height: 35px;
+            border-bottom: 2px dashed var(--accent-color);
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-color);
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s;
+        }
+
+        /* Feedback Styles */
+        .correct {
+            background-color: var(--success-color) !important;
+            color: white !important;
+            border-bottom-style: solid;
+        }
+
+        .incorrect {
+            background-color: var(--error-color) !important;
+            color: white !important;
+            border-bottom-style: solid;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        button.main-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-reset { background-color: #e67e22; color: white; }
+        .btn-solution { background-color: var(--accent-color); color: white; }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .task-row { font-size: 1rem; }
+            .btn-group { flex-direction: column; }
+            button.main-btn { width: 100%; }
+            .puzzle-pieces { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Russische Grammatik</h1>
+    <h2>Endungs-Puzzle: Akkusativ</h2>
+
+    <div class="intro-box">
+        <strong>Anleitung:</strong> Ziehe die passenden Endungs-Bausteine aus dem grauen Feld auf die gestrichelten Linien, um die Sätze zu vervollständigen. Achte auf Geschlecht und Belebtheit der Substantive. Mit „Zurücksetzen und mischen“ wird die Reihenfolge der Aufgaben neu gewürfelt.
+    </div>
+
+    <!-- Die Bausteine (Endungen) -->
+    <div class="puzzle-pieces" id="pieces">
+        <div class="piece" draggable="true">ого</div>
+        <div class="piece" draggable="true">его</div>
+        <div class="piece" draggable="true">ую</div>
+        <div class="piece" draggable="true">юю</div>
+        <div class="piece" draggable="true">ое</div>
+        <div class="piece" draggable="true">ее</div>
+        <div class="piece" draggable="true">ый</div>
+        <div class="piece" draggable="true">ий</div>
+        <div class="piece" draggable="true">ой</div>
+    </div>
+
+    <div class="exercise-list" id="exercise-container">
+        <!-- Aufgaben werden per JS geladen -->
+    </div>
+
+    <div class="btn-group">
+        <button class="main-btn btn-reset" onclick="resetAndShuffle()">Zurücksetzen und mischen</button>
+        <button class="main-btn btn-solution" onclick="showAllSolutions()">Lösungen anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const taskData = [
+        { id: 1, stem: "Я вижу интересн", noun: "книгу.", ans: "ую" },
+        { id: 2, stem: "Мы знаем стар", noun: "друга.", ans: "ого" },
+        { id: 3, stem: "Он покупает син", noun: "карандаш.", ans: "ий" },
+        { id: 4, stem: "Я вижу нов", noun: "окно.", ans: "ое" },
+        { id: 5, stem: "Ты знаешь умн", noun: "профессора?", ans: "ого" },
+        { id: 6, stem: "Мы слушаем русск", noun: "музыку.", ans: "ую" },
+        { id: 7, stem: "Я вижу хорош", noun: "студента.", ans: "его" },
+        { id: 8, stem: "Она видит больш", noun: "здание.", ans: "ое" },
+        { id: 9, stem: "Мы купили син", noun: "ручку.", ans: "юю" },
+        { id: 10, stem: "Я люблю маленьк", noun: "кота.", ans: "ого" },
+        { id: 11, stem: "Ты пьёшь горяч", noun: "молоко?", ans: "ее" },
+        { id: 12, stem: "Он читает интересн", noun: "журнал.", ans: "ый" },
+        { id: 13, stem: "Мы видим глубок", noun: "море.", ans: "ое" },
+        { id: 14, stem: "Я жду строг", noun: "преподавателя.", ans: "ого" },
+        { id: 15, stem: "Она переплывает широк", noun: "реку.", ans: "ую" }
+    ];
+
+    let currentTasks = [];
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function renderTasks() {
+        const container = document.getElementById('exercise-container');
+        container.innerHTML = '';
+        
+        currentTasks.forEach((task, index) => {
+            const row = document.createElement('div');
+            row.className = 'task-row';
+            row.innerHTML = `
+                <span class="task-number">${index + 1}.</span>
+                <span>${task.stem}</span>
+                <div class="drop-zone" id="drop-${task.id}" ondragover="allowDrop(event)" ondrop="handleDrop(event, ${task.id})"></div>
+                <span>${task.noun}</span>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    // Drag & Drop Logic
+    let draggedText = '';
+
+    document.querySelectorAll('.piece').forEach(piece => {
+        piece.addEventListener('dragstart', (e) => {
+            draggedText = e.target.innerText;
+        });
+    });
+
+    function allowDrop(e) {
+        e.preventDefault();
+    }
+
+    function handleDrop(e, taskId) {
+        e.preventDefault();
+        const dropZone = document.getElementById(`drop-${taskId}`);
+        const task = taskData.find(t => t.id === taskId);
+        
+        dropZone.innerText = draggedText;
+        dropZone.classList.remove('correct', 'incorrect');
+        
+        if (draggedText === task.ans) {
+            dropZone.classList.add('correct');
+        } else {
+            dropZone.classList.add('incorrect');
+        }
+    }
+
+    function resetAndShuffle() {
+        currentTasks = shuffle([...taskData]);
+        renderTasks();
+    }
+
+    function showAllSolutions() {
+        currentTasks.forEach(task => {
+            const dropZone = document.getElementById(`drop-${task.id}`);
+            dropZone.innerText = task.ans;
+            dropZone.classList.remove('incorrect');
+            dropZone.classList.add('correct');
+        });
+    }
+
+    // Initial Start
+    window.onload = resetAndShuffle;
+</script>
+
+</body>
+</html>
