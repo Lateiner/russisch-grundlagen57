@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satzbau-Baukasten: Russischer Akkusativ</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --correct-bg: #dff0d8;
+            --incorrect-bg: #f2dede;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            font-style: normal;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            font-style: normal;
+        }
+
+        .intro-box {
+            background: #eef2f7;
+            padding: 20px;
+            border-left: 5px solid var(--accent-color);
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .exercise-card {
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .instruction-small {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .word-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #eee;
+            border-radius: 6px;
+            min-height: 50px;
+        }
+
+        .base-word {
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+
+        .base-word:hover {
+            background: #e1f5fe;
+            transform: scale(1.05);
+        }
+
+        .sentence-builder {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            min-height: 80px;
+            padding: 15px;
+            border: 2px dashed #ccc;
+            border-radius: 6px;
+            background: white;
+            align-items: flex-start;
+        }
+
+        .slot {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 2px solid #ccc;
+            font-family: inherit;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .feedback-correct {
+            border-color: var(--success-color) !important;
+            background-color: var(--correct-bg) !important;
+            color: #2c512d !important;
+        }
+
+        .feedback-incorrect {
+            border-color: var(--error-color) !important;
+            background-color: var(--incorrect-bg) !important;
+            color: #721c24 !important;
+        }
+
+        .remove-btn {
+            font-size: 0.7rem;
+            color: var(--error-color);
+            cursor: pointer;
+            text-align: center;
+            margin-top: 2px;
+            text-decoration: underline;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .main-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .btn-reset { background-color: #e67e22; color: white; }
+        .btn-solution { background-color: var(--accent-color); color: white; }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .btn-group { flex-direction: column; }
+            select { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Russische Grammatik</h1>
+    <h2>Satzbau-Baukasten: Akkusativ</h2>
+
+    <div class="intro-box">
+        Anleitung: Bringe die Wörter in die richtige Reihenfolge und wähle die korrekte Endung. 
+        Klicke auf ein Wort im grauen Feld, um es dem Satz hinzuzufügen. 
+        Klicke auf „entfernen“ unter einem Wort, um es wieder aus dem Satz zu löschen.
+    </div>
+
+    <div id="exercises-container"></div>
+
+    <div class="btn-group">
+        <button class="main-btn btn-reset" onclick="initAll()">Zurücksetzen & Mischen</button>
+        <button class="main-btn btn-solution" onclick="showAllSolutions()">Lösungen anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const taskData = [
+        { id: 1, words: [
+            { base: "Я", options: ["Я"], correct: "Я" },
+            { base: "видеть", options: ["вижу", "видят"], correct: "вижу" },
+            { base: "новый", options: ["новый", "нового", "новую"], correct: "новую" },
+            { base: "книга", options: ["книга", "книгу"], correct: "книгу" }
+        ]},
+        { id: 2, words: [
+            { base: "Он", options: ["Он"], correct: "Он" },
+            { base: "знать", options: ["знает", "знают"], correct: "знает" },
+            { base: "старый", options: ["старый", "старого"], correct: "старого" },
+            { base: "друг", options: ["друг", "друга"], correct: "друга" }
+        ]},
+        { id: 3, words: [
+            { base: "Мы", options: ["Мы"], correct: "Мы" },
+            { base: "слушать", options: ["слушаем", "слушают"], correct: "слушаем" },
+            { base: "русская", options: ["русская", "русскую"], correct: "русскую" },
+            { base: "музыка", options: ["музыка", "музыку"], correct: "музыку" }
+        ]},
+        { id: 4, words: [
+            { base: "Она", options: ["Она"], correct: "Она" },
+            { base: "покупать", options: ["покупает", "покупают"], correct: "покупает" },
+            { base: "вкусное", options: ["вкусное", "вкусную"], correct: "вкусное" },
+            { base: "яблоко", options: ["яблоко", "яблока"], correct: "яблоко" }
+        ]},
+        { id: 5, words: [
+            { base: "Ты", options: ["Ты"], correct: "Ты" },
+            { base: "встречать", options: ["встречаешь", "встречает"], correct: "встречаешь" },
+            { base: "младший", options: ["младший", "младшего"], correct: "младшего" },
+            { base: "brat", options: ["брат", "брата"], correct: "брата" }
+        ]},
+        { id: 6, words: [
+            { base: "Я", options: ["Я"], correct: "Я" },
+            { base: "любить", options: ["люблю", "любит"], correct: "люблю" },
+            { base: "синее", options: ["синее", "синюю"], correct: "синее" },
+            { base: "море", options: ["море", "моря"], correct: "море" }
+        ]},
+        { id: 7, words: [
+            { base: "Она", options: ["Она"], correct: "Она" },
+            { base: "ждать", options: ["ждёт", "ждут"], correct: "ждёт" },
+            { base: "старая", options: ["старая", "старую"], correct: "старую" },
+            { base: "подруга", options: ["подруга", "подругу"], correct: "подругу" }
+        ]},
+        { id: 8, words: [
+            { base: "Мы", options: ["Мы"], correct: "Мы" },
+            { base: "видеть", options: ["видим", "видят"], correct: "видим" },
+            { base: "большой", options: ["большой", "большого"], correct: "большой" },
+            { base: "город", options: ["город", "города"], correct: "город" }
+        ]},
+        { id: 9, words: [
+            { base: "Я", options: ["Я"], correct: "Я" },
+            { base: "пить", options: ["пью", "пьёт"], correct: "пью" },
+            { base: "холодный", options: ["холодный", "холодного"], correct: "холодный" },
+            { base: "чай", options: ["чай", "чая"], correct: "чай" }
+        ]},
+        { id: 10, words: [
+            { base: "Она", options: ["Она"], correct: "Она" },
+            { base: "рисовать", options: ["рисует", "рисуют"], correct: "рисует" },
+            { base: "красивая", options: ["красивая", "красивую"], correct: "красивую" },
+            { base: "картина", options: ["картина", "картину"], correct: "картину" }
+        ]},
+        { id: 11, words: [
+            { base: "Мы", options: ["Мы"], correct: "Мы" },
+            { base: "знать", options: ["знаем", "знают"], correct: "знаем" },
+            { base: "хороший", options: ["хороший", "хорошего"], correct: "хорошего" },
+            { base: "врач", options: ["врач", "врача"], correct: "врача" }
+        ]},
+        { id: 12, words: [
+            { base: "Он", options: ["Он"], correct: "Он" },
+            { base: "читать", options: ["читает", "читают"], correct: "читает" },
+            { base: "интересный", options: ["интересный", "интересного"], correct: "интересный" },
+            { base: "журнал", options: ["журнал", "журнала"], correct: "журнал" }
+        ]},
+        { id: 13, words: [
+            { base: "Я", options: ["Я"], correct: "Я" },
+            { base: "встречать", options: ["встречаю", "встречает"], correct: "встречаю" },
+            { base: "русский", options: ["русский", "русского"], correct: "русского" },
+            { base: "преподаватель", options: ["преподаватель", "преподавателя"], correct: "преподавателя" }
+        ]},
+        { id: 14, words: [
+            { base: "Мы", options: ["Мы"], correct: "Мы" },
+            { base: "видеть", options: ["видим", "видят"], correct: "видим" },
+            { base: "высокое", options: ["высокое", "высокую"], correct: "высокое" },
+            { base: "здание", options: ["здание", "здания"], correct: "здание" }
+        ]},
+        { id: 15, words: [
+            { base: "Ты", options: ["Ты"], correct: "Ты" },
+            { base: "любить", options: ["любишь", "любят"], correct: "любишь" },
+            { base: "пушистый", options: ["пушистый", "пушистого"], correct: "пушистого" },
+            { base: "кот", options: ["кот", "кота"], correct: "кота" }
+        ]}
+    ];
+
+    // Datenbereinigung
+    taskData[4].words[3].base = "брат";
+
+    let state = [];
+
+    function shuffle(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
+    function initAll() {
+        state = taskData.map(task => ({
+            ...task,
+            pool: shuffle([...task.words.map(w => w.base)]),
+            current: []
+        }));
+        render();
+    }
+
+    function render() {
+        const container = document.getElementById('exercises-container');
+        container.innerHTML = '';
+
+        state.forEach((task, tIdx) => {
+            const card = document.createElement('div');
+            card.className = 'exercise-card';
+            
+            let poolHtml = task.pool.map(word => 
+                `<div class="base-word" onclick="addWord(${tIdx}, '${word}')">${word}</div>`
+            ).join('');
+
+            let builderHtml = task.current.map((wordObj, wIdx) => `
+                <div class="slot">
+                    <select id="sel-${tIdx}-${wIdx}" onchange="validate(${tIdx}, ${wIdx})">
+                        <option value="">-- ? --</option>
+                        ${wordObj.options.map(opt => `<option value="${opt}" ${wordObj.selected === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                    </select>
+                    <span class="remove-btn" onclick="removeWord(${tIdx}, ${wIdx})">entfernen</span>
+                </div>
+            `).join('');
+
+            card.innerHTML = `
+                <span class="instruction-small">Aufgabe ${tIdx + 1}: Bilde den Satz</span>
+                <div class="word-pool">${poolHtml}</div>
+                <div class="sentence-builder" id="builder-${tIdx}">${builderHtml}</div>
+            `;
+            container.appendChild(card);
+            
+            // Sofortige Validierung beim Rendern (falls schon was ausgewählt war)
+            task.current.forEach((_, wIdx) => validate(tIdx, wIdx));
+        });
+    }
+
+    function addWord(tIdx, base) {
+        const task = state[tIdx];
+        if (task.pool.length === 0) return;
+
+        // Finde das Original-Wort-Objekt aus den Stammdaten dieser Aufgabe
+        const originalWord = task.words.find(w => w.base === base);
+        
+        task.current.push({
+            ...originalWord,
+            selected: ""
+        });
+
+        // Aus Pool entfernen
+        const idx = task.pool.indexOf(base);
+        if (idx > -1) task.pool.splice(idx, 1);
+
+        render();
+    }
+
+    function removeWord(tIdx, wIdx) {
+        const task = state[tIdx];
+        const removedWord = task.current.splice(wIdx, 1)[0];
+        task.pool.push(removedWord.base);
+        render();
+    }
+
+    function validate(tIdx, wIdx) {
+        const task = state[tIdx];
+        const select = document.getElementById(`sel-${tIdx}-${wIdx}`);
+        if (!select) return;
+
+        const selectedValue = select.value;
+        task.current[wIdx].selected = selectedValue;
+
+        select.classList.remove('feedback-correct', 'feedback-incorrect');
+
+        if (selectedValue === "") return;
+
+        // Validierung:
+        // 1. Ist das Wort an der richtigen Position im Satz (gemäß task.words)?
+        // 2. Ist die gewählte Form die korrekte Endung?
+        const correctWordAtThisPos = task.words[wIdx];
+
+        if (task.current[wIdx].base === correctWordAtThisPos.base && 
+            selectedValue === correctWordAtThisPos.correct) {
+            select.classList.add('feedback-correct');
+        } else {
+            select.classList.add('feedback-incorrect');
+        }
+    }
+
+    function showAllSolutions() {
+        state.forEach((task, tIdx) => {
+            task.current = task.words.map(w => ({ ...w, selected: w.correct }));
+            task.pool = [];
+        });
+        render();
+    }
+
+    window.onload = initAll;
+</script>
+
+</body>
+</html>
