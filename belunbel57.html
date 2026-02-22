@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animacy-Check: Belebt vs. Unbelebt</title>
+    <!-- Polyfill für Touch-Geräte -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --correct-bg: #dff0d8;
+            --incorrect-bg: #f2dede;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            font-style: normal;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            font-style: normal;
+        }
+
+        .intro-box {
+            background: #eef2f7;
+            padding: 20px;
+            border-left: 5px solid var(--accent-color);
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .exercise-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .task-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            align-items: center;
+            background: #fafafa;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .word-display {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .btn-choice {
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .btn-choice:hover {
+            border-color: var(--accent-color);
+        }
+
+        /* Feedback Styles */
+        .feedback-correct {
+            background-color: var(--success-color) !important;
+            color: white !important;
+            border-color: var(--success-color) !important;
+        }
+
+        .feedback-incorrect {
+            background-color: var(--error-color) !important;
+            color: white !important;
+            border-color: var(--error-color) !important;
+        }
+
+        .feedback-solution {
+            border-color: var(--accent-color) !important;
+            background-color: #ebf5fb !important;
+            color: var(--accent-color) !important;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .main-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-reset { background-color: #e67e22; color: white; }
+        .btn-solution { background-color: var(--accent-color); color: white; }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .task-row {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .main-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Russische Grammatik</h1>
+    <h2>Animacy-Check: Belebt vs. Unbelebt</h2>
+
+    <div class="intro-box">
+        <strong>Anleitung:</strong> Diese Übung ist der erste Schritt zur korrekten Adjektivendung. 
+        Im Akkusativ verändern maskuline Adjektive ihre Endung nur, wenn das Substantiv <strong>belebt</strong> (Mensch oder Tier) ist. 
+        Entscheide für jedes Wort: Ist es „Belebt“ oder „Unbelebt“?
+    </div>
+
+    <div class="exercise-grid" id="quiz-container">
+        <!-- Aufgaben werden hier geladen -->
+    </div>
+
+    <div class="btn-group">
+        <button class="main-btn btn-reset" onclick="resetAndShuffle()">Neu mischen & Zurücksetzen</button>
+        <button class="main-btn btn-solution" onclick="showAllSolutions()">Lösungen anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const taskData = [
+        { id: 1, word: "брат", animate: true },
+        { id: 2, word: "стол", animate: false },
+        { id: 3, word: "кот", animate: true },
+        { id: 4, word: "компьютер", animate: false },
+        { id: 5, word: "профессор", animate: true },
+        { id: 6, word: "музей", animate: false },
+        { id: 7, word: "медведь", animate: true },
+        { id: 8, word: "карандаш", animate: false },
+        { id: 9, word: "отец", animate: true },
+        { id: 10, word: "телефон", animate: false },
+        { id: 11, word: "актёр", animate: true },
+        { id: 12, word: "словарь", animate: false },
+        { id: 13, word: "тигр", animate: true },
+        { id: 14, word: "город", animate: false },
+        { id: 15, word: "врач", animate: true },
+        { id: 16, word: "парк", animate: false },
+        { id: 17, word: "студент", animate: true },
+        { id: 18, word: "дом", animate: false },
+        { id: 19, word: "друг", animate: true },
+        { id: 20, word: "учебник", animate: false }
+    ];
+
+    let currentTasks = [];
+
+    function shuffle(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
+    function renderQuiz() {
+        const container = document.getElementById('quiz-container');
+        container.innerHTML = '';
+        currentTasks.forEach((task, index) => {
+            const row = document.createElement('div');
+            row.className = 'task-row';
+            row.id = `row-${task.id}`;
+            row.innerHTML = `
+                <div class="word-display">${index + 1}. ${task.word}</div>
+                <button class="btn-choice" id="btn-anim-${task.id}" onclick="check(${task.id}, true)">Belebt</button>
+                <button class="btn-choice" id="btn-inan-${task.id}" onclick="check(${task.id}, false)">Unbelebt</button>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    function check(taskId, userChoiceIsAnimate) {
+        const task = taskData.find(t => t.id === taskId);
+        const btnAnim = document.getElementById(`btn-anim-${taskId}`);
+        const btnInan = document.getElementById(`btn-inan-${taskId}`);
+
+        // Feedback zurücksetzen
+        btnAnim.classList.remove('feedback-correct', 'feedback-incorrect');
+        btnInan.classList.remove('feedback-correct', 'feedback-incorrect');
+
+        if (userChoiceIsAnimate) {
+            if (task.animate === true) {
+                btnAnim.classList.add('feedback-correct');
+            } else {
+                btnAnim.classList.add('feedback-incorrect');
+            }
+        } else {
+            if (task.animate === false) {
+                btnInan.classList.add('feedback-correct');
+            } else {
+                btnInan.classList.add('feedback-incorrect');
+            }
+        }
+    }
+
+    function resetAndShuffle() {
+        currentTasks = shuffle([...taskData]);
+        renderQuiz();
+    }
+
+    function showAllSolutions() {
+        currentTasks.forEach(task => {
+            const btnAnim = document.getElementById(`btn-anim-${task.id}`);
+            const btnInan = document.getElementById(`btn-inan-${task.id}`);
+
+            btnAnim.classList.remove('feedback-correct', 'feedback-incorrect', 'feedback-solution');
+            btnInan.classList.remove('feedback-correct', 'feedback-incorrect', 'feedback-solution');
+
+            if (task.animate === true) {
+                btnAnim.classList.add('feedback-solution');
+            } else {
+                btnInan.classList.add('feedback-solution');
+            }
+        });
+    }
+
+    // Initialstart
+    window.onload = resetAndShuffle;
+</script>
+
+</body>
+</html>
