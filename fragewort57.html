@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matching: Fragewörter im Akkusativ</title>
+    <!-- Polyfill für Touch-Geräte -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px-15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .intro-box {
+            background: #eef2f7;
+            padding: 15px;
+            border-left: 5px solid var(--accent-color);
+            margin-bottom: 25px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        /* Bereich für die zu ziehenden Sätze */
+        .sentence-pool {
+            background: #f9f9f9;
+            border: 2px dashed #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+            min-height: 80px;
+        }
+
+        .draggable {
+            padding: 10px 15px;
+            background: white;
+            border: 2px solid var(--accent-color);
+            border-radius: 6px;
+            cursor: grab;
+            user-select: none;
+            font-weight: 500;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        /* Drop-Zonen (Fragewörter) */
+        .drop-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .drop-box {
+            min-height: 150px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 3px solid #ddd;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .drop-box h3 {
+            text-align: center;
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .drop-box.over {
+            background: #ebf5fb;
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        /* Feedback-Zustände */
+        .correct {
+            background-color: #dff0d8 !important;
+            border-color: var(--success-color) !important;
+            color: #3c763d !important;
+        }
+
+        .incorrect {
+            background-color: #f2dede !important;
+            border-color: var(--error-color) !important;
+            color: #a94442 !important;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        .btn-reset { background-color: #95a5a6; color: white; }
+        .btn-solution { background-color: var(--accent-color); color: white; }
+        button:hover { opacity: 0.9; }
+
+        @media (max-width: 650px) {
+            .drop-grid { grid-template-columns: 1fr; }
+            .container { padding: 15px; }
+            .draggable { font-size: 0.9rem; width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Russische Grammatik</h1>
+    <h2>Fragewort-Zuordnung (Akkusativ)</h2>
+
+    <div class="intro-box">
+        <strong>Anleitung:</strong> Ziehe die Sätze per Drag-and-Drop in die Box mit dem passenden Fragewort. 
+        Achte darauf, ob das Subjekt männlich belebt (Какого?), männlich unbelebt (Какой?), weiblich (Какую?) oder sächlich (Какое?) ist.
+    </div>
+
+    <div class="sentence-pool" id="pool" ondrop="onDrop(event)" ondragover="onDragOver(event)">
+        <!-- Sätze werden per JS geladen -->
+    </div>
+
+    <div class="drop-grid">
+        <div class="drop-box" id="kakogo" ondrop="onDrop(event)" ondragover="onDragOver(event)">
+            <h3>Какого?</h3>
+        </div>
+        <div class="drop-box" id="kakuju" ondrop="onDrop(event)" ondragover="onDragOver(event)">
+            <h3>Какую?</h3>
+        </div>
+        <div class="drop-box" id="kakoj" ondrop="onDrop(event)" ondragover="onDragOver(event)">
+            <h3>Какой?</h3>
+        </div>
+        <div class="drop-box" id="kakoe" ondrop="onDrop(event)" ondragover="onDragOver(event)">
+            <h3>Какое?</h3>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-reset" onclick="resetGame()">Zurücksetzen</button>
+        <button class="btn-solution" onclick="showSolution()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { id: 1, text: "Я вижу старого друга.", cat: "kakogo" },
+        { id: 2, text: "Мы слушаем громкую музыку.", cat: "kakuju" },
+        { id: 3, text: "Он читает новый журнал.", cat: "kakoj" },
+        { id: 4, text: "Она видит синее море.", cat: "kakoe" },
+        { id: 5, text: "Ты знаешь русского профессора?", cat: "kakogo" },
+        { id: 6, text: "Я покупаю вкусное яблоко.", cat: "kakoe" },
+        { id: 7, text: "Мы видим интересную картину.", cat: "kakuju" },
+        { id: 8, text: "Я пью холодный чай.", cat: "kakoj" },
+        { id: 9, text: "Она ждёт младшего брата.", cat: "kakogo" },
+        { id: 10, text: "Я люблю твою сестру.", cat: "kakuju" }
+    ];
+
+    const pool = document.getElementById('pool');
+    const dropZones = ['kakogo', 'kakuju', 'kakoj', 'kakoe'];
+
+    function initGame() {
+        // Pool leeren und Sätze mischen
+        pool.innerHTML = '';
+        dropZones.forEach(id => {
+            const zone = document.getElementById(id);
+            const title = zone.querySelector('h3');
+            zone.innerHTML = '';
+            zone.appendChild(title);
+        });
+
+        const shuffled = [...data].sort(() => Math.random() - 0.5);
+        shuffled.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'draggable';
+            div.draggable = true;
+            div.id = `s-${item.id}`;
+            div.innerText = item.text;
+            div.dataset.cat = item.cat;
+            div.addEventListener('dragstart', onDragStart);
+            pool.appendChild(div);
+        });
+    }
+
+    function onDragStart(ev) {
+        ev.dataTransfer.setData("text/plain", ev.target.id);
+    }
+
+    function onDragOver(ev) {
+        ev.preventDefault();
+        const zone = ev.target.closest('.drop-box') || ev.target.closest('.sentence-pool');
+        if (zone && zone.classList.contains('drop-box')) {
+            zone.classList.add('over');
+        }
+    }
+
+    // Entfernt Highlight beim Verlassen
+    document.addEventListener('dragleave', (ev) => {
+        if (ev.target.classList.contains('drop-box')) {
+            ev.target.classList.remove('over');
+        }
+    });
+
+    function onDrop(ev) {
+        ev.preventDefault();
+        const id = ev.dataTransfer.getData("text/plain");
+        const draggable = document.getElementById(id);
+        let zone = ev.target.closest('.drop-box') || ev.target.closest('.sentence-pool');
+
+        if (zone) {
+            zone.appendChild(draggable);
+            zone.classList.remove('over');
+            validateItem(draggable, zone.id);
+        }
+    }
+
+    function validateItem(el, zoneId) {
+        el.classList.remove('correct', 'incorrect');
+        if (zoneId === 'pool') return;
+
+        if (el.dataset.cat === zoneId) {
+            el.classList.add('correct');
+        } else {
+            el.classList.add('incorrect');
+        }
+    }
+
+    function resetGame() {
+        initGame();
+    }
+
+    function showSolution() {
+        data.forEach(item => {
+            const el = document.getElementById(`s-${item.id}`);
+            const targetZone = document.getElementById(item.cat);
+            targetZone.appendChild(el);
+            el.classList.remove('incorrect');
+            el.classList.add('correct');
+        });
+    }
+
+    window.onload = initGame;
+</script>
+
+</body>
+</html>
