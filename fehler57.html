@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fehlersuche: Russischer Akkusativ</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --correct-bg: #dff0d8;
+            --incorrect-bg: #f2dede;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            font-style: normal;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            font-style: normal;
+        }
+
+        .intro-box {
+            background: #eef2f7;
+            padding: 20px;
+            border-left: 5px solid var(--accent-color);
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .text-block {
+            font-size: 1.2rem;
+            background: #fafafa;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .sentence {
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* Styling für die klickbaren Fehler-Wörter */
+        .error-word {
+            color: var(--accent-color);
+            text-decoration: underline dotted;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .error-word:hover {
+            background-color: #e3f2fd;
+        }
+
+        /* Das Auswahlmenü, das erscheint */
+        .correction-select {
+            padding: 4px;
+            font-size: 1.1rem;
+            border-radius: 4px;
+            border: 2px solid var(--accent-color);
+            font-family: inherit;
+            margin: 0 4px;
+            outline: none;
+        }
+
+        .feedback-correct {
+            background-color: var(--success-color) !important;
+            color: white !important;
+            border-color: var(--success-color) !important;
+            text-decoration: none;
+        }
+
+        .feedback-incorrect {
+            background-color: var(--error-color) !important;
+            color: white !important;
+            border-color: var(--error-color) !important;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-reset { background-color: #95a5a6; color: white; }
+        .btn-solution { background-color: var(--accent-color); color: white; }
+        button:hover { opacity: 0.9; }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .text-block { font-size: 1.1rem; }
+            .btn-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Russische Grammatik</h1>
+    <h2>Fehlersuche: Adjektivendungen im Akkusativ</h2>
+
+    <div class="intro-box">
+        <strong>Anleitung:</strong> In den folgenden Sätzen haben die Adjektive falsche Endungen. 
+        Klicke auf die blau unterstrichenen Wörter und wähle im Menü die korrekte Form aus. 
+        Es gibt insgesamt 15 Fehler zu finden.
+    </div>
+
+    <div class="text-block" id="content">
+        <!-- Sätze werden per JS generiert -->
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-reset" onclick="resetAll()">Zurücksetzen</button>
+        <button class="btn-solution" onclick="showAllSolutions()">Lösungen anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const exerciseData = [
+        { id: 1, pre: "Я вижу ", wrong: "старый", options: ["старый", "старого", "старую"], correct: "старого", post: " друга." },
+        { id: 2, pre: "Она читает ", wrong: "интересная", options: ["интересная", "интересного", "интересную"], correct: "интересную", post: " книгу." },
+        { id: 3, pre: "Мы видим ", wrong: "большую", options: ["большое", "большую", "большого"], correct: "большое", post: " здание." },
+        { id: 4, pre: "Ты любишь ", wrong: "русская", options: ["русская", "русского", "русскую"], correct: "русскую", post: " музыку?" },
+        { id: 5, pre: "Я знаю ", wrong: "хороший", options: ["хороший", "хорошего", "хорошую"], correct: "хорошего", post: " профессора." },
+        { id: 6, pre: "Он покупает ", wrong: "красного", options: ["красный", "красного", "красную"], correct: "красный", post: " словарь." },
+        { id: 7, pre: "Мы слушаем ", wrong: "классическая", options: ["классическая", "классическую", "классическое"], correct: "классическую", post: " музыку." },
+        { id: 8, pre: "Я вижу ", wrong: "синюю", options: ["синее", "синюю", "синего"], correct: "синее", post: " небо." },
+        { id: 9, pre: "Она ждёт ", wrong: "младший", options: ["младший", "младшего", "младшую"], correct: "младшего", post: " брата." },
+        { id: 10, pre: "Я пью ", wrong: "горячую", options: ["горячее", "горячую", "горячего"], correct: "горячее", post: " молоко." },
+        { id: 11, pre: "Мы встретили ", wrong: "старая", options: ["старая", "старого", "старую"], correct: "старую", post: " подругу." },
+        { id: 12, pre: "Ты видишь ", wrong: "белого", options: ["белый", "белого", "белую"], correct: "белый", post: " стул?" },
+        { id: 13, pre: "Я делаю ", wrong: "трудная", options: ["трудная", "трудное", "трудную"], correct: "трудное", post: " упражнение." },
+        { id: 14, pre: "Мы любим ", wrong: "пушистый", options: ["пушистый", "пушистого", "пушистую"], correct: "пушистого", post: " кота." },
+        { id: 15, pre: "Я купил ", wrong: "синнюю", options: ["синюю", "синий", "синее"], correct: "синюю", post: " ручку." }
+    ];
+
+    const contentDiv = document.getElementById('content');
+
+    function renderText() {
+        contentDiv.innerHTML = '';
+        exerciseData.forEach(item => {
+            const span = document.createElement('span');
+            span.className = 'sentence';
+            span.innerHTML = `
+                ${item.pre}<span class="error-word" id="word-${item.id}" onclick="makeSelect(${item.id})">${item.wrong}</span>${item.post}
+            `;
+            contentDiv.appendChild(span);
+        });
+    }
+
+    function makeSelect(id) {
+        const wordSpan = document.getElementById(`word-${id}`);
+        if (wordSpan.tagName === 'SELECT') return;
+
+        const item = exerciseData.find(d => d.id === id);
+        const select = document.createElement('select');
+        select.className = 'correction-select';
+        select.id = `word-${id}`;
+
+        // Standard-Option
+        const defOpt = document.createElement('option');
+        defOpt.text = "--?--";
+        defOpt.value = "";
+        select.add(defOpt);
+
+        item.options.forEach(opt => {
+            const o = document.createElement('option');
+            o.text = opt;
+            o.value = opt;
+            select.add(o);
+        });
+
+        select.onchange = () => validate(id, select);
+        wordSpan.replaceWith(select);
+        select.focus();
+    }
+
+    function validate(id, selectEl) {
+        const item = exerciseData.find(d => d.id === id);
+        selectEl.classList.remove('feedback-correct', 'feedback-incorrect');
+
+        if (selectEl.value === "") return;
+
+        if (selectEl.value === item.correct) {
+            selectEl.classList.add('feedback-correct');
+        } else {
+            selectEl.classList.add('feedback-incorrect');
+        }
+    }
+
+    function resetAll() {
+        renderText();
+    }
+
+    function showAllSolutions() {
+        exerciseData.forEach(item => {
+            const el = document.getElementById(`word-${item.id}`);
+            
+            // Falls es noch ein Span ist, in Select umwandeln
+            if (el.tagName === 'SPAN') {
+                makeSelect(item.id);
+            }
+            
+            // Jetzt ist es sicher ein Select
+            const select = document.getElementById(`word-${item.id}`);
+            select.value = item.correct;
+            select.classList.remove('feedback-incorrect');
+            select.classList.add('feedback-correct');
+        });
+    }
+
+    // Initialisierung
+    window.onload = renderText;
+</script>
+
+</body>
+</html>
