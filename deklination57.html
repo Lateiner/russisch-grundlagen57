@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deklinations-Tabelle: Russische Adjektive</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --table-header: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            font-style: normal;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            font-style: normal;
+        }
+
+        .intro-box {
+            background: #eef2f7;
+            padding: 20px;
+            border-left: 5px solid var(--accent-color);
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        /* Tabellen-Styling */
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px; /* Garantiert Lesbarkeit auf Mobilgeräten */
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: var(--table-header);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .row-label {
+            background-color: #f9f9f9;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        /* Dropdown Styling */
+        select {
+            width: 100%;
+            padding: 6px;
+            border-radius: 4px;
+            border: 2px solid #ccc;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #fff;
+        }
+
+        .feedback-correct {
+            background-color: #dff0d8 !important;
+            border-color: var(--success-color) !important;
+            color: #3c763d !important;
+        }
+
+        .feedback-incorrect {
+            background-color: #f2dede !important;
+            border-color: var(--error-color) !important;
+            color: #a94442 !important;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button.main-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-reset { background-color: #95a5a6; color: white; }
+        .btn-solution { background-color: var(--accent-color); color: white; }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .btn-group { flex-direction: column; }
+            button.main-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Russische Grammatik</h1>
+    <h2>Deklinations-Tabelle: Adjektive im Akkusativ</h2>
+
+    <div class="intro-box">
+        <strong>Anleitung:</strong> Vervollständige die Tabelle der Adjektivendungen im Akkusativ (Fall 4). Wähle für jedes Feld die korrekte Form aus dem Dropdown-Menü aus. Es gibt insgesamt 15 Felder auszufüllen.
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Typ / Stamm</th>
+                    <th>Maskulin (unbelebt)</th>
+                    <th>Maskulin (belebt)</th>
+                    <th>Feminin</th>
+                    <th>Neutrum</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <!-- Zeile 1: Hart (новый) -->
+                <tr>
+                    <td class="row-label">Hart (-ый) <br><small>новый</small></td>
+                    <td><select id="t1" onchange="check('t1', 'новый')"><option value="">--</option><option value="новый">новый</option><option value="нового">нового</option></select></td>
+                    <td><select id="t2" onchange="check('t2', 'нового')"><option value="">--</option><option value="новый">новый</option><option value="нового">нового</option></select></td>
+                    <td><select id="t3" onchange="check('t3', 'новую')"><option value="">--</option><option value="новая">новая</option><option value="новую">новую</option></select></td>
+                    <td><select id="t4" onchange="check('t4', 'новое')"><option value="">--</option><option value="новое">новое</option><option value="нового">нового</option></select></td>
+                </tr>
+                <!-- Zeile 2: Weich (-ий) <br><small>синий</small> -->
+                <tr>
+                    <td class="row-label">Weich (-ий) <br><small>синий</small></td>
+                    <td><select id="t5" onchange="check('t5', 'синий')"><option value="">--</option><option value="синий">синий</option><option value="синего">синего</option></select></td>
+                    <td><select id="t6" onchange="check('t6', 'синего')"><option value="">--</option><option value="синий">синий</option><option value="синего">синего</option></select></td>
+                    <td><select id="t7" onchange="check('t7', 'синюю')"><option value="">--</option><option value="синяя">синяя</option><option value="синюю">синюю</option></select></td>
+                    <td><select id="t8" onchange="check('t8', 'синее')"><option value="">--</option><option value="синее">синее</option><option value="синего">синего</option></select></td>
+                </tr>
+                <!-- Zeile 3: Zischlaut (betont) <br><small>большой</small> -->
+                <tr>
+                    <td class="row-label">Zischl. (betont) <br><small>большой</small></td>
+                    <td><select id="t9" onchange="check('t9', 'большой')"><option value="">--</option><option value="большой">большой</option><option value="большого">большого</option></select></td>
+                    <td><select id="t10" onchange="check('t10', 'большого')"><option value="">--</option><option value="большой">большой</option><option value="большого">большого</option></select></td>
+                    <td><select id="t11" onchange="check('t11', 'большую')"><option value="">--</option><option value="большая">большая</option><option value="большую">большую</option></select></td>
+                    <td><select id="t12" onchange="check('t12', 'большое')"><option value="">--</option><option value="большое">большое</option><option value="большого">большого</option></select></td>
+                </tr>
+                <!-- Zeile 4: Zischlaut (unbetont) <br><small>хороший</small> -->
+                <tr>
+                    <td class="row-label">Zischl. (unbetont) <br><small>хороший</small></td>
+                    <td><select id="t13" onchange="check('t13', 'хороший')"><option value="">--</option><option value="хороший">хороший</option><option value="хорошего">хорошего</option></select></td>
+                    <td><select id="t14" onchange="check('t14', 'хорошего')"><option value="">--</option><option value="хороший">хороший</option><option value="хорошего">хорошего</option></select></td>
+                    <td><select id="t15" onchange="check('t15', 'хорошую')"><option value="">--</option><option value="хорошая">хорошая</option><option value="хорошую">хорошую</option></select></td>
+                    <td>---</td> <!-- Das Neutrum хорошего wurde weggelassen, um bei 15 Aufgaben zu bleiben -->
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="btn-group">
+        <button class="main-btn btn-reset" onclick="resetTable()">Zurücksetzen</button>
+        <button class="main-btn btn-solution" onclick="showSolutions()">Lösungen anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const solutions = {
+        t1: "новый", t2: "нового", t3: "новую", t4: "новое",
+        t5: "синий", t6: "синего", t7: "синюю", t8: "синее",
+        t9: "большой", t10: "большого", t11: "большую", t12: "большое",
+        t13: "хороший", t14: "хорошего", t15: "хорошую"
+    };
+
+    function check(id, correctVal) {
+        const el = document.getElementById(id);
+        el.classList.remove('feedback-correct', 'feedback-incorrect');
+        
+        if (el.value === "") return;
+
+        if (el.value === correctVal) {
+            el.classList.add('feedback-correct');
+        } else {
+            el.classList.add('feedback-incorrect');
+        }
+    }
+
+    function resetTable() {
+        for (let id in solutions) {
+            const el = document.getElementById(id);
+            el.value = "";
+            el.classList.remove('feedback-correct', 'feedback-incorrect');
+        }
+    }
+
+    function showSolutions() {
+        for (let id in solutions) {
+            const el = document.getElementById(id);
+            el.value = solutions[id];
+            el.classList.remove('feedback-incorrect');
+            el.classList.add('feedback-correct');
+        }
+    }
+</script>
+
+</body>
+</html>
